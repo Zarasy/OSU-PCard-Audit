@@ -3,8 +3,8 @@ import os
 import re
 import sqlite3
 import time
-from pathlib import Path
 from html import escape
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
@@ -47,12 +47,19 @@ st.set_page_config(
 
 
 # ==================================================
-# STYLING
+# DESIGN
 # ==================================================
 
 st.markdown(
     """
     <style>
+    :root {
+        --audit-navy: #172740;
+        --audit-blue: #234b82;
+        --audit-light: #e8eef6;
+        --audit-border: #cdd8e7;
+    }
+
     .stApp {
         background-color: #f4f6fa;
     }
@@ -68,15 +75,15 @@ st.markdown(
     }
 
     .header-box {
-        background: #172740;
-        color: white;
+        background-color: #172740;
+        color: #ffffff;
         padding: 32px;
         border-radius: 15px;
-        margin-bottom: 25px;
+        margin-bottom: 26px;
     }
 
     .header-title {
-        color: white;
+        color: #ffffff;
         font-size: 29px;
         font-weight: 750;
         margin-bottom: 9px;
@@ -93,75 +100,112 @@ st.markdown(
         line-height: 1.7;
     }
 
-    /* Make the navigation tabs prominent */
+    /* NAVIGATION: large, prominent tab cards */
+
+    div[data-testid="stTabs"] [data-baseweb="tab-list"],
     .stTabs [data-baseweb="tab-list"] {
-        display: flex;
-        gap: 16px;
-        background: transparent;
-        border: none;
-        padding: 5px 0 18px;
+        display: flex !important;
+        width: 100% !important;
+        gap: 16px !important;
+        padding: 4px 0 20px !important;
+        border-bottom: none !important;
+        background: transparent !important;
     }
 
+    div[data-testid="stTabs"] [data-baseweb="tab"],
     .stTabs [data-baseweb="tab"] {
-        flex: 1;
-        justify-content: center;
-        min-height: 76px;
-        padding: 18px 22px;
-        border-radius: 12px;
-        border: 2px solid #d5ddea;
-        background-color: #e9eef5;
-        color: #172740;
-        font-size: 19px;
-        font-weight: 700;
-        white-space: normal;
-        text-align: center;
-        transition:
-            background-color 0.2s ease,
-            border-color 0.2s ease;
+        flex: 1 1 0 !important;
+        width: 50% !important;
+        min-width: 0 !important;
+        min-height: 86px !important;
+        padding: 20px 14px !important;
+        justify-content: center !important;
+        align-items: center !important;
+        border: 2px solid #cdd8e7 !important;
+        border-radius: 13px !important;
+        background-color: #e8eef6 !important;
+        color: #172740 !important;
+        box-shadow: none !important;
+        white-space: normal !important;
+        text-align: center !important;
     }
 
-    .stTabs [data-baseweb="tab"]:hover {
-        background-color: #dbe7f7;
-        border-color: #8da9d6;
-        color: #172740;
-    }
-
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        background-color: #172740;
-        color: #ffffff;
-        border-color: #172740;
-        box-shadow: 0 5px 14px rgba(23, 39, 64, 0.16);
-    }
-
-    .stTabs [data-baseweb="tab"][aria-selected="true"] p {
-        color: #ffffff;
-    }
-
+    div[data-testid="stTabs"] [data-baseweb="tab"] p,
     .stTabs [data-baseweb="tab"] p {
-        font-size: 19px;
-        font-weight: 700;
-        color: inherit;
+        color: inherit !important;
+        font-size: 19px !important;
+        font-weight: 750 !important;
+        line-height: 1.4 !important;
+        text-align: center !important;
     }
 
+    div[data-testid="stTabs"] [data-baseweb="tab"]:hover,
+    .stTabs [data-baseweb="tab"]:hover {
+        background-color: #dbe7f7 !important;
+        border-color: #8da9d6 !important;
+    }
+
+    div[data-testid="stTabs"]
+    [data-baseweb="tab"][aria-selected="true"],
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background-color: #172740 !important;
+        border-color: #172740 !important;
+        color: #ffffff !important;
+        box-shadow: 0 5px 15px rgba(23, 39, 64, 0.18)
+            !important;
+    }
+
+    div[data-testid="stTabs"]
+    [data-baseweb="tab"][aria-selected="true"] p,
+    .stTabs
+    [data-baseweb="tab"][aria-selected="true"] p {
+        color: #ffffff !important;
+    }
+
+    div[data-testid="stTabs"]
+    [data-baseweb="tab-highlight"],
+    div[data-testid="stTabs"]
+    [data-baseweb="tab-border"],
     .stTabs [data-baseweb="tab-highlight"],
     .stTabs [data-baseweb="tab-border"] {
-        display: none;
+        display: none !important;
+    }
+
+    /* BUTTONS */
+
+    div.stButton > button[kind="primary"],
+    div.stButton > button[data-testid="stBaseButton-primary"] {
+        background-color: #172740 !important;
+        border-color: #172740 !important;
+        color: #ffffff !important;
+    }
+
+    div.stButton > button[kind="primary"]:hover,
+    div.stButton > button[data-testid="stBaseButton-primary"]:hover {
+        background-color: #234b82 !important;
+        border-color: #234b82 !important;
+        color: #ffffff !important;
+    }
+
+    div.stButton > button[kind="secondary"],
+    div.stButton > button[data-testid="stBaseButton-secondary"] {
+        background-color: #ffffff !important;
+        border: 1px solid #aabbd1 !important;
+        color: #172740 !important;
+    }
+
+    div.stButton > button[kind="secondary"]:hover,
+    div.stButton > button[data-testid="stBaseButton-secondary"]:hover {
+        background-color: #e8eef6 !important;
+        border-color: #172740 !important;
+        color: #172740 !important;
     }
 
     div[data-testid="stMetric"] {
-        background: white;
+        background: #ffffff;
         border: 1px solid #e1e6ee;
         border-radius: 12px;
         padding: 22px;
-    }
-
-    div[data-testid="stMetricValue"] {
-        font-size: 36px;
-        color: #172740;
-    }
-
-    div[data-testid="stAlert"] {
-        border-radius: 10px;
     }
 
     .result-value {
@@ -173,14 +217,15 @@ st.markdown(
     }
 
     @media (max-width: 700px) {
+        div[data-testid="stTabs"] [data-baseweb="tab"],
         .stTabs [data-baseweb="tab"] {
-            min-height: 70px;
-            padding: 12px 8px;
-            font-size: 14px;
+            min-height: 75px !important;
+            padding: 12px 8px !important;
         }
 
+        div[data-testid="stTabs"] [data-baseweb="tab"] p,
         .stTabs [data-baseweb="tab"] p {
-            font-size: 14px;
+            font-size: 14px !important;
         }
 
         .header-box {
@@ -202,7 +247,7 @@ st.markdown(
 
 
 # ==================================================
-# DATABASE FUNCTIONS
+# DATABASE
 # ==================================================
 
 def get_connection():
@@ -243,32 +288,22 @@ def execute_readonly(sql, parameters=()):
         deadline = time.monotonic() + 5
 
         def check_timeout():
-            return (
-                1
-                if time.monotonic() > deadline
-                else 0
-            )
+            return 1 if time.monotonic() > deadline else 0
 
         connection.set_progress_handler(
             check_timeout,
             1000,
         )
 
-        cursor = connection.execute(
-            sql,
-            parameters,
-        )
-
+        cursor = connection.execute(sql, parameters)
         rows = cursor.fetchmany(101)
 
         return {
             "columns": [
-                item[0]
-                for item in cursor.description
+                item[0] for item in cursor.description
             ],
             "rows": [
-                dict(row)
-                for row in rows[:100]
+                dict(row) for row in rows[:100]
             ],
             "limited": len(rows) > 100,
         }
@@ -336,16 +371,14 @@ def search_transactions(year, field, keyword):
 
 
 # ==================================================
-# GEMINI FUNCTIONS
+# GEMINI
 # ==================================================
 
 def get_secret(name, default=None):
     try:
         value = st.secrets.get(name)
-
         if value:
             return value
-
     except Exception:
         pass
 
@@ -434,7 +467,7 @@ User question:
 
 
 # ==================================================
-# RESULTS
+# RESULT DISPLAY
 # ==================================================
 
 def show_results(result):
@@ -483,10 +516,8 @@ def show_ai_answer(result):
 
         if isinstance(value, int):
             display_value = f"{value:,}"
-
         elif isinstance(value, float):
             display_value = f"{value:,.2f}"
-
         else:
             display_value = str(value)
 
@@ -576,13 +607,11 @@ dashboard_tab, ai_tab = st.tabs(
 
 
 # ==================================================
-# TAB 1: AUDIT DASHBOARD
+# AUDIT DASHBOARD
 # ==================================================
 
 with dashboard_tab:
-    st.header(
-        "Prohibited Purchase Dashboard"
-    )
+    st.header("Prohibited Purchase Dashboard")
 
     st.markdown(
         '<p class="section-note">'
@@ -634,22 +663,18 @@ with dashboard_tab:
 
         with col1:
             with st.container(border=True):
-                st.subheader(
-                    "Description Search"
-                )
+                st.subheader("Description Search")
 
                 st.caption(
                     "Search transaction descriptions "
                     "for purchases requiring review."
                 )
 
-                description_keyword = (
-                    st.text_input(
-                        "Description keyword",
-                        placeholder=(
-                            "e.g. alcohol, gift, gasoline"
-                        ),
-                    )
+                description_keyword = st.text_input(
+                    "Description keyword",
+                    placeholder=(
+                        "e.g. alcohol, gift, gasoline"
+                    ),
                 )
 
                 description_search = st.button(
@@ -660,9 +685,7 @@ with dashboard_tab:
 
         with col2:
             with st.container(border=True):
-                st.subheader(
-                    "Vendor Search"
-                )
+                st.subheader("Vendor Search")
 
                 st.caption(
                     "Search merchant names for "
@@ -717,10 +740,7 @@ with dashboard_tab:
                 st.error(str(error))
 
         st.divider()
-
-        st.subheader(
-            "Transaction Results"
-        )
+        st.subheader("Transaction Results")
 
         if "search_result" in st.session_state:
             result = st.session_state[
@@ -752,9 +772,7 @@ with dashboard_tab:
                     data=dataframe.to_csv(
                         index=False
                     ).encode("utf-8-sig"),
-                    file_name=(
-                        "pcard_audit_results.csv"
-                    ),
+                    file_name="pcard_audit_results.csv",
                     mime="text/csv",
                 )
 
@@ -796,7 +814,7 @@ with dashboard_tab:
 
 
 # ==================================================
-# TAB 2: ASK THE DATABASE
+# ASK THE DATABASE
 # ==================================================
 
 with ai_tab:
@@ -884,15 +902,10 @@ with ai_tab:
 
     if "ai_result" in st.session_state:
         st.divider()
-
-        st.subheader(
-            "Analysis Result"
-        )
+        st.subheader("Analysis Result")
 
         show_ai_answer(
-            st.session_state[
-                "ai_result"
-            ]
+            st.session_state["ai_result"]
         )
 
 
