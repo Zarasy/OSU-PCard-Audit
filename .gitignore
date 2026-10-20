@@ -1,0 +1,20 @@
+# API keys and environment variables
+.env
+.env.*
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Database files
+pcards.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# macOS
+.DS_Store

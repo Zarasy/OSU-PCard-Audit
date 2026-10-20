@@ -1,0 +1,767 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OSU | P-Card Audit Platform</title>
+  <style>
+    :root {
+      --navy: #172740;
+      --blue: #2563eb;
+      --bg: #f4f6fa;
+      --line: #e1e6ee;
+      --muted: #64748b;
+      --green: #15803d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--navy);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 28px max(24px, calc((100% - 1150px)/2));
+    }
+
+    header h1 { margin: 0 0 8px; font-size: 26px; }
+    header p { margin: 0; color: #cbd5e1; font-size: 14px; }
+
+    main {
+      max-width: 1150px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    button { cursor: pointer; font: inherit; }
+
+    .tab {
+      padding: 13px 22px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: white;
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .tab.active { background: var(--navy); color: white; }
+
+    .panel {
+      background: white;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      margin-bottom: 20px;
+    }
+
+    h2 { margin-top: 0; }
+    h3 { margin-top: 0; font-size: 17px; }
+
+    .muted { color: var(--muted); line-height: 1.6; }
+
+    .instructions {
+      background: #eff6ff;
+      border-left: 4px solid var(--blue);
+      padding: 16px 20px;
+      border-radius: 6px;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font: inherit;
+      background: white;
+    }
+
+    textarea { min-height: 110px; resize: vertical; }
+
+    .primary {
+      background: var(--blue);
+      color: white;
+      border: 0;
+      border-radius: 7px;
+      padding: 12px 20px;
+      font-weight: 600;
+      margin-top: 14px;
+    }
+
+    .primary:disabled { opacity: 0.6; cursor: wait; }
+
+    .secondary {
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      padding: 10px 15px;
+    }
+
+    .result-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-wrap { overflow-x: auto; margin-top: 18px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: #f1f5f9;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th, td {
+      padding: 11px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    tr:hover td { background: #f8fafc; }
+
+    .status {
+      color: var(--muted);
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    .error { color: #b91c1c; }
+
+    .answer-card {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 26px;
+      margin-top: 20px;
+    }
+
+    .answer-label {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 14px;
+    }
+
+    .answer-number {
+      font-size: 42px;
+      font-weight: bold;
+      letter-spacing: -1px;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .answer-text {
+      font-size: 17px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .question-preview {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    details {
+      margin-top: 22px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    pre {
+      background: #eef2f7;
+      padding: 16px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .hidden { display: none; }
+
+    .categories {
+      columns: 2;
+      padding-left: 20px;
+      line-height: 1.9;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .grid { grid-template-columns: 1fr; }
+      .categories { columns: 1; }
+      .panel { padding: 20px; }
+      .tabs { flex-direction: column; }
+      .answer-number { font-size: 32px; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>OSU P-Card Audit Platform</h1>
+  <p>Transaction Monitoring & Internal Control Review</p>
+</header>
+
+<main>
+  <nav class="tabs" aria-label="Main navigation">
+    <button class="tab active" id="dashboardTab"
+      onclick="switchTab('dashboard')">Audit Dashboard</button>
+    <button class="tab" id="aiTab"
+      onclick="switchTab('ai')">Ask the Database</button>
+  </nav>
+
+  <section id="dashboard">
+    <div class="panel">
+      <h2>Prohibited Purchase Dashboard</h2>
+      <p class="muted">
+        Identify transactions that may require further
+        investigation under OSU P-card purchasing policies.
+      </p>
+
+      <div class="instructions">
+        <strong>How to use this dashboard</strong>
+        <ol>
+          <li>Select a transaction year.</li>
+          <li>Choose Description Search or Vendor Search.</li>
+          <li>Enter a keyword and run the search.</li>
+          <li>Review matching transactions.</li>
+          <li>Export results to CSV for follow-up.</li>
+        </ol>
+        Keyword matches indicate transactions for review,
+        not confirmed policy violations.
+      </div>
+
+      <label for="year">Transaction Year</label>
+      <select id="year">
+        <option value="2014">2014</option>
+      </select>
+
+      <div class="grid" style="margin-top:22px;">
+        <div class="panel" style="margin:0;">
+          <h3>Description Search</h3>
+          <p class="muted">
+            Search transaction descriptions for possible
+            prohibited purchases.
+          </p>
+          <label for="descriptionKeyword">Keyword</label>
+          <input id="descriptionKeyword"
+            placeholder="e.g. alcohol, gift, gasoline">
+          <button class="primary" id="descriptionButton"
+            onclick="searchTransactions('Description')">
+            Search Descriptions
+          </button>
+        </div>
+
+        <div class="panel" style="margin:0;">
+          <h3>Vendor Search</h3>
+          <p class="muted">
+            Search vendor names for merchants requiring review.
+          </p>
+          <label for="vendorKeyword">Keyword</label>
+          <input id="vendorKeyword"
+            placeholder="e.g. post office, USPS">
+          <button class="primary" id="vendorButton"
+            onclick="searchTransactions('Vendor')">
+            Search Vendors
+          </button>
+        </div>
+      </div>
+
+      <p class="status" id="searchStatus" role="status"></p>
+    </div>
+
+    <div class="panel">
+      <h3>Prohibited Purchase Categories</h3>
+      <ul class="categories">
+        <li>Alcohol</li>
+        <li>Cash and ATM transactions</li>
+        <li>Decorations</li>
+        <li>Donations and sponsorships</li>
+        <li>Gasoline</li>
+        <li>Gifts and gift cards</li>
+        <li>Insurance</li>
+        <li>Late fees</li>
+        <li>Mail and postage</li>
+        <li>Moving expenses</li>
+        <li>Personal purchases</li>
+        <li>Individual memberships and dues</li>
+        <li>Salaries, wages and benefits</li>
+        <li>Service and incentive awards</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <div class="result-heading">
+        <h2>Transaction Results</h2>
+        <button class="secondary" id="exportButton"
+          onclick="exportCSV()" disabled>
+          Export CSV
+        </button>
+      </div>
+      <p class="muted" id="resultSummary">
+        Run a search to display matching transactions.
+      </p>
+      <div class="table-wrap" id="resultsTable"></div>
+    </div>
+  </section>
+
+  <section id="ai" class="hidden">
+    <div class="panel">
+      <h2>Ask the Database</h2>
+      <p class="muted">
+        Ask a question in plain English and receive an
+        answer based on the P-card transaction database.
+      </p>
+
+      <div class="instructions">
+        <strong>How to use</strong>
+        <p>
+          Type your question and click Analyze.
+          The system uses Gemini AI to interpret the question
+          and retrieves results from the database.
+        </p>
+        <strong>Example questions</strong>
+        <ul>
+          <li>How many transactions occurred in 2014?</li>
+          <li>What was the total spending in 2013?</li>
+          <li>Which 10 vendors received the most money in 2014?</li>
+          <li>Which employees had the highest spending in 2014?</li>
+        </ul>
+      </div>
+
+      <label for="question">Your Question</label>
+      <textarea id="question"
+        placeholder="Ask a question about P-card transactions..."></textarea>
+
+      <button class="primary" id="askButton"
+        onclick="askGemini()">Analyze Question</button>
+
+      <p id="aiStatus" class="status" role="status"></p>
+    </div>
+
+    <div class="panel hidden" id="answerPanel">
+      <h2>Analysis Result</h2>
+
+      <div class="question-preview" id="questionPreview"></div>
+
+      <div class="answer-card">
+        <div class="answer-label">ANALYSIS COMPLETE</div>
+        <div id="answerContent"></div>
+      </div>
+
+      <div id="aiResultsSection" class="hidden">
+        <h3 style="margin-top:26px;">Detailed Results</h3>
+        <p class="muted" id="aiSummary"></p>
+        <div class="table-wrap" id="aiResults"></div>
+      </div>
+
+      <details>
+        <summary>Technical details · View SQL query</summary>
+        <pre id="generatedSQL"></pre>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  OSU P-Card Audit Platform |
+  Educational auditing project
+</footer>
+
+<script>
+  let currentRows = [];
+  let currentColumns = [];
+
+  function switchTab(tab) {
+    const dashboard = tab === "dashboard";
+
+    document.getElementById("dashboard")
+      .classList.toggle("hidden", !dashboard);
+
+    document.getElementById("ai")
+      .classList.toggle("hidden", dashboard);
+
+    document.getElementById("dashboardTab")
+      .classList.toggle("active", dashboard);
+
+    document.getElementById("aiTab")
+      .classList.toggle("active", !dashboard);
+  }
+
+  async function getJSON(url, options = {}) {
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Request failed.");
+    }
+
+    return data;
+  }
+
+  async function loadYears() {
+    try {
+      const data = await getJSON("/api/years");
+      const select = document.getElementById("year");
+      select.replaceChildren();
+
+      for (const year of data.years) {
+        const option = document.createElement("option");
+        option.value = year;
+        option.textContent = year;
+        select.appendChild(option);
+      }
+
+      if (data.years.includes(2014)) {
+        select.value = "2014";
+      }
+    } catch (error) {
+      document.getElementById("searchStatus")
+        .textContent = "Could not load years: " + error.message;
+    }
+  }
+
+  function renderTable(containerId, columns, rows) {
+    const container = document.getElementById(containerId);
+    container.replaceChildren();
+
+    if (!rows || rows.length === 0) {
+      container.textContent = "No matching records found.";
+      return;
+    }
+
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const headingRow = document.createElement("tr");
+
+    for (const column of columns) {
+      const th = document.createElement("th");
+      th.textContent = column;
+      headingRow.appendChild(th);
+    }
+
+    thead.appendChild(headingRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    for (const row of rows) {
+      const tr = document.createElement("tr");
+
+      for (const column of columns) {
+        const td = document.createElement("td");
+        const value = row[column];
+
+        td.textContent =
+          value === null || value === undefined
+            ? ""
+            : String(value);
+
+        tr.appendChild(td);
+      }
+
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+  }
+
+  async function searchTransactions(field) {
+    const year = document.getElementById("year").value;
+
+    const inputId = field === "Description"
+      ? "descriptionKeyword"
+      : "vendorKeyword";
+
+    const keyword = document.getElementById(inputId)
+      .value.trim();
+
+    const status = document.getElementById("searchStatus");
+    const summary = document.getElementById("resultSummary");
+    const exportButton = document.getElementById("exportButton");
+
+    if (!keyword) {
+      status.textContent = "Please enter a keyword.";
+      return;
+    }
+
+    status.textContent = "Searching transactions...";
+    status.classList.remove("error");
+
+    currentRows = [];
+    currentColumns = [];
+    exportButton.disabled = true;
+
+    try {
+      const params = new URLSearchParams({
+        year: year,
+        field: field,
+        keyword: keyword
+      });
+
+      const data = await getJSON(
+        "/api/search?" + params.toString()
+      );
+
+      currentRows = data.rows;
+      currentColumns = data.columns;
+
+      renderTable("resultsTable", data.columns, data.rows);
+
+      summary.textContent =
+        data.rows.length +
+        (data.limited ? " displayed (result limit reached)" : "") +
+        " matching transactions for " +
+        year + " in " + field + ".";
+
+      exportButton.disabled = data.rows.length === 0;
+      status.textContent = "Search completed.";
+    } catch (error) {
+      status.textContent = error.message;
+      status.classList.add("error");
+      summary.textContent = "Search failed.";
+      document.getElementById("resultsTable")
+        .replaceChildren();
+    }
+  }
+
+  function formatValue(value) {
+    if (typeof value === "number") {
+      return new Intl.NumberFormat("en-US", {
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    return String(value ?? "");
+  }
+
+  function createAnswer(data) {
+    const container = document.getElementById("answerContent");
+    container.replaceChildren();
+
+    const rows = data.rows || [];
+    const columns = data.columns || [];
+
+    if (rows.length === 0) {
+      const p = document.createElement("p");
+      p.className = "answer-text";
+      p.textContent =
+        "No matching records were found for this question.";
+      container.appendChild(p);
+      return;
+    }
+
+    // Display one-value answers as a prominent result
+    if (rows.length === 1 && columns.length === 1) {
+      const value = rows[0][columns[0]];
+
+      const number = document.createElement("div");
+      number.className = "answer-number";
+      number.textContent = formatValue(value);
+
+      const explanation = document.createElement("p");
+      explanation.className = "answer-text";
+
+      const question = data.question.toLowerCase();
+
+      if (
+        question.includes("how many") &&
+        question.includes("transaction")
+      ) {
+        explanation.textContent =
+          "P-card transactions were recorded for the requested period.";
+      } else if (
+        question.includes("total") &&
+        (question.includes("spending") ||
+         question.includes("spent"))
+      ) {
+        explanation.textContent =
+          "Total transaction amount for the requested analysis.";
+      } else {
+        explanation.textContent =
+          "Result calculated from the P-card database.";
+      }
+
+      container.appendChild(number);
+      container.appendChild(explanation);
+      return;
+    }
+
+    const p = document.createElement("p");
+    p.className = "answer-text";
+
+    if (rows.length === 1) {
+      p.textContent =
+        "The database returned one matching record. " +
+        "Review the details below.";
+    } else {
+      p.textContent =
+        "The analysis returned " +
+        rows.length +
+        " result rows. Review the findings below.";
+    }
+
+    container.appendChild(p);
+  }
+
+  async function askGemini() {
+    const question = document.getElementById("question")
+      .value.trim();
+
+    const status = document.getElementById("aiStatus");
+    const button = document.getElementById("askButton");
+    const panel = document.getElementById("answerPanel");
+
+    if (!question) {
+      status.textContent = "Please enter a question.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Analyzing your question...";
+    status.classList.remove("error");
+    panel.classList.add("hidden");
+
+    try {
+      const data = await getJSON("/api/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ question: question })
+      });
+
+      document.getElementById("questionPreview")
+        .textContent = "Question: " + question;
+
+      document.getElementById("generatedSQL")
+        .textContent = data.sql;
+
+      createAnswer(data);
+
+      const detailedSection =
+        document.getElementById("aiResultsSection");
+
+      if (data.rows.length === 1 && data.columns.length === 1) {
+        detailedSection.classList.add("hidden");
+      } else {
+        detailedSection.classList.remove("hidden");
+
+        renderTable(
+          "aiResults",
+          data.columns,
+          data.rows
+        );
+
+        document.getElementById("aiSummary")
+          .textContent =
+          data.rows.length +
+          (data.limited ? " displayed (result limit reached)" : "") +
+          " result rows.";
+      }
+
+      panel.classList.remove("hidden");
+      status.textContent = "Analysis completed.";
+
+    } catch (error) {
+      status.textContent = error.message;
+      status.classList.add("error");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function exportCSV() {
+    if (!currentRows.length) return;
+
+    const escapeCSV = (value) => {
+      let text = value === null || value === undefined
+        ? ""
+        : String(value);
+
+      if (/^[\s]*[=+\-@]/.test(text)) {
+        text = "'" + text;
+      }
+
+      return '"' + text.replace(/"/g, '""') + '"';
+    };
+
+    const lines = [
+      currentColumns.map(escapeCSV).join(",")
+    ];
+
+    for (const row of currentRows) {
+      lines.push(
+        currentColumns.map(
+          column => escapeCSV(row[column])
+        ).join(",")
+      );
+    }
+
+    const blob = new Blob(
+      [lines.join("\r\n")],
+      { type: "text/csv;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "pcard_audit_results.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
+  }
+
+  loadYears();
+</script>
+</body>
+</html>
